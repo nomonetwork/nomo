@@ -24,7 +24,7 @@ sp-api = { version = "2.0.0", default-features = false, git = "https://github.co
 sp-block-builder = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 sp-consensus-aura = { version = "0.8.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 sp-core = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
-sp-inherents = { versuib = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate"}
+sp-inherents = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 sp-offchain = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 sp-runtime = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 sp-session = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }

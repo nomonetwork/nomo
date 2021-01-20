@@ -1,0 +1,16 @@
+[package]
+name = "np-domain"
+version = "0.1.0"
+authors = ["Wei Tang <wei@that.world>"]
+license = "Apache-2.0"
+description = "Domain handling for Nomo."
+edition = "2018"
+
+[dependencies]
+sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate", default-features = false }
+
+[features]
+default = ["std"]
+std = [
+	"sp-core/std",
+]

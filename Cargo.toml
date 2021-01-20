@@ -59,5 +59,6 @@ runtime-benchmarks = [
 
 [workspace]
 members = [
+	"primitives/domain",
 	"runtime",
 ]
