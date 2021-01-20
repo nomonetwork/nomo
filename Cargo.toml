@@ -1,0 +1,63 @@
+[package]
+name = "nomo"
+version = "0.1.0"
+authors =  ["Wei Tang <wei@that.world>"]
+description = "Proof-of-stake decentralized naming service based on Substrate."
+edition = "2018"
+license = "GPL-3.0-or-later"
+build = "build.rs"
+repository = "https://github.com/nomonetwork/nomo"
+
+[[bin]]
+name = "nomo"
+
+[dependencies]
+structopt = "0.3.8"
+
+sc-cli = { version = "0.8.0", git = "https://github.com/paritytech/substrate", features = ["wasmtime"] }
+sp-core = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-executor = { version = "0.8.0", git = "https://github.com/paritytech/substrate", features = ["wasmtime"] }
+sc-service = { version = "0.8.0", git = "https://github.com/paritytech/substrate", features = ["wasmtime"] }
+sc-keystore = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sp-inherents = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sp-transaction-pool = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-consensus-aura = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sp-consensus-aura = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sp-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sc-consensus = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sc-finality-grandpa = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sp-finality-grandpa = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-client-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sp-runtime = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+
+# These dependencies are used for nomo's RPCs
+jsonrpc-core = "15.1.0"
+sc-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sp-api = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-rpc-api = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+sp-blockchain = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sp-block-builder = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+sc-basic-authorship = { version = "0.8.0", git = "https://github.com/paritytech/substrate" }
+substrate-frame-rpc-system = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+pallet-transaction-payment-rpc = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+
+# These dependencies are used for runtime benchmarking
+frame-benchmarking = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+frame-benchmarking-cli = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+
+nomo-runtime = { version = "0.1.0", path = "runtime" }
+
+[build-dependencies]
+substrate-build-script-utils = { version = "2.0.0", git = "https://github.com/paritytech/substrate" }
+
+[features]
+default = []
+runtime-benchmarks = [
+	"nomo-runtime/runtime-benchmarks",
+]
+
+[workspace]
+members = [
+	"runtime",
+]

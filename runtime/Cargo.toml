@@ -1,0 +1,85 @@
+[package]
+name = "nomo-runtime"
+version = "0.1.0"
+authors = ["Wei Tang <wei@that.world>"]
+edition = "2018"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/nomonetwork/nomo"
+
+[dependencies]
+codec = { package = "parity-scale-codec", version = "1.3.6", default-features = false, features = ["derive"] }
+
+pallet-aura = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-balances = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-support = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-grandpa = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-randomness-collective-flip = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-sudo = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-system = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-timestamp = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-transaction-payment = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+frame-executive = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+serde = { version = "1.0.101", optional = true, features = ["derive"] }
+sp-api = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-block-builder = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-consensus-aura = { version = "0.8.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-core = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-inherents = { versuib = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate"}
+sp-offchain = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-runtime = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-session = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-std = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-transaction-pool = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+sp-version = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+
+# Used for the nomo's RPCs
+frame-system-rpc-runtime-api = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+pallet-transaction-payment-rpc-runtime-api = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
+
+# Used for runtime benchmarking
+frame-benchmarking = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate", optional = true }
+frame-system-benchmarking = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate", optional = true }
+hex-literal = { version = "0.3.1", optional = true }
+
+[build-dependencies]
+substrate-wasm-builder = { version = "3.0.0", git = "https://github.com/paritytech/substrate" }
+
+[features]
+default = ["std"]
+std = [
+	"codec/std",
+	"frame-executive/std",
+	"frame-support/std",
+	"pallet-aura/std",
+	"pallet-balances/std",
+	"pallet-grandpa/std",
+	"pallet-randomness-collective-flip/std",
+	"pallet-sudo/std",
+	"pallet-timestamp/std",
+	"pallet-transaction-payment/std",
+	"pallet-transaction-payment-rpc-runtime-api/std",
+	"serde",
+	"sp-api/std",
+	"sp-block-builder/std",
+	"sp-consensus-aura/std",
+	"sp-core/std",
+	"sp-inherents/std",
+	"sp-offchain/std",
+	"sp-runtime/std",
+	"sp-session/std",
+	"sp-std/std",
+	"sp-transaction-pool/std",
+	"sp-version/std",
+	"frame-system/std",
+	"frame-system-rpc-runtime-api/std",
+]
+runtime-benchmarks = [
+	"sp-runtime/runtime-benchmarks",
+	"frame-benchmarking",
+	"frame-support/runtime-benchmarks",
+	"frame-system-benchmarking",
+	"hex-literal",
+	"frame-system/runtime-benchmarks",
+	"pallet-balances/runtime-benchmarks",
+	"pallet-timestamp/runtime-benchmarks",
+]
