@@ -1,0 +1,121 @@
+trigger:
+- master
+- refs/tags/*
+
+variables:
+  RUST_STABLE: 1.47.0
+  RUST_NIGHTLY: nightly-2020-10-23
+
+jobs:
+- job: Linux
+  pool:
+    vmImage: 'ubuntu-latest'
+  timeoutInMinutes: 0
+  steps:
+  - script: git submodule update --init --recursive
+    displayName: 'Submodules'
+  - script: |
+      curl -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y
+      source ~/.cargo/env
+      rustup update $(RUST_STABLE)
+      rustup update $(RUST_NIGHTLY)
+      rustup target add wasm32-unknown-unknown --toolchain $(RUST_NIGHTLY)
+    displayName: 'Rust setup'
+  - script: |
+      source ~/.cargo/env
+      RANDOMX_ARCH=default RUSTUP_TOOLCHAIN=$(RUST_STABLE) WASM_BUILD_TOOLCHAIN=$(RUST_NIGHTLY) cargo test --release --all --locked
+    displayName: 'Run tests'
+  - script: |
+      source ~/.cargo/env
+      RANDOMX_ARCH=default RUSTUP_TOOLCHAIN=$(RUST_STABLE) WASM_BUILD_TOOLCHAIN=$(RUST_NIGHTLY) cargo build --release --locked
+    displayName: 'Build artifacts'
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: 'target/release/nomo'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/nomo-linux.zip'
+    displayName: 'Archive artifacts'
+  - script: |
+      shasum -a 256 $(Build.ArtifactStagingDirectory)/nomo-linux.zip > $(Build.ArtifactStagingDirectory)/nomo-linux.zip.sha256
+    displayName: 'Finalize artifacts'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+
+- job: WebAssembly
+  pool:
+    vmImage: 'ubuntu-latest'
+  timeoutInMinutes: 0
+  steps:
+  - script: git submodule update --init --recursive
+    displayName: 'Submodules'
+  - script: docker build --tag nomo-wasm-build:ci --no-cache --pull .
+    displayName: 'Build docker'
+  - script: |
+      docker run --volume=$(Build.ArtifactStagingDirectory):/wasm nomo-wasm-build:ci export-builtin-wasm /wasm
+    displayName: 'Generate wasm'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+
+- job: MacOS
+  pool:
+    vmImage: 'macOS-latest'
+  timeoutInMinutes: 0
+  steps:
+  - script: git submodule update --init --recursive
+    displayName: 'Submodules'
+  - script: |
+      curl -sSf https://sh.rustup.rs | sh -s -- --default-toolchain none -y
+      source ~/.cargo/env
+      rustup update $(RUST_STABLE)
+      rustup update $(RUST_NIGHTLY)
+      rustup target add wasm32-unknown-unknown --toolchain $(RUST_NIGHTLY)
+    displayName: 'Rust setup'
+  - script: |
+      source ~/.cargo/env
+      RANDOMX_ARCH=default RUSTUP_TOOLCHAIN=$(RUST_STABLE) WASM_BUILD_TOOLCHAIN=$(RUST_NIGHTLY) cargo build --release --locked
+    displayName: 'Build artifacts'
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: 'target/release/nomo'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/nomo-macos.zip'
+    displayName: 'Archive artifacts'
+  - script: |
+      shasum -a 256 $(Build.ArtifactStagingDirectory)/nomo-macos.zip > $(Build.ArtifactStagingDirectory)/nomo-macos.zip.sha256
+    displayName: 'Finalize artifacts'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+
+- job: Windows
+  pool:
+    vmImage: 'windows-2019'
+  timeoutInMinutes: 0
+  steps:
+  - script: git submodule update --init --recursive
+    displayName: 'Submodules'
+  - script: |
+      rustup update --no-self-update $(RUST_NIGHTLY)
+      rustup update --no-self-update $(RUST_STABLE)
+      rustup target add wasm32-unknown-unknown --toolchain $(RUST_NIGHTLY)
+    displayName: 'Rust setup'
+  - script: |
+      set LIBCLANG_PATH=C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\VC\Tools\Llvm\x64\bin
+      set RANDOMX_ARCH=default
+      set RUSTUP_TOOLCHAIN=$(RUST_STABLE)
+      set WASM_BUILD_TOOLCHAIN=$(RUST_NIGHTLY)
+      cargo build --release --locked
+    displayName: 'Build artifacts'
+  - task: ArchiveFiles@2
+    inputs:
+      rootFolderOrFile: 'target/release/nomo.exe'
+      includeRootFolder: false
+      archiveType: 'zip'
+      archiveFile: '$(Build.ArtifactStagingDirectory)/nomo-windows.zip'
+    displayName: 'Archive artifacts'
+  - script: |
+      CertUtil -hashfile $(Build.ArtifactStagingDirectory)/nomo-windows.zip SHA256 > $(Build.ArtifactStagingDirectory)/nomo-windows.zip.sha256
+    displayName: 'Finalize artifacts'
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
