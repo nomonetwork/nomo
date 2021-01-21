@@ -3691,6 +3691,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "pallet-registry"
+version = "0.1.0"
+dependencies = [
+ "frame-benchmarking",
+ "frame-support",
+ "frame-system",
+ "pallet-balances",
+ "parity-scale-codec",
+ "serde",
+ "sp-core",
+ "sp-io",
+ "sp-runtime",
+ "sp-std",
+]
+
+[[package]]
 name = "pallet-session"
 version = "2.0.1"
 source = "git+https://github.com/paritytech/substrate#486863052317548871957bd17712012768882f5b"
