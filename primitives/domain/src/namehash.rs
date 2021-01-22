@@ -13,32 +13,33 @@
 // limitations under the License.
 
 use sp_core::{blake2_256, H256};
-use crate::is_label;
+use crate::{is_label, Label, Name};
 
 /// Get the label hash of a string. Returns None if the label is not valid.
-pub fn labelhash(s: &str) -> Option<H256> {
-	if !is_label(s) {
+pub fn labelhash(label: &Label) -> Option<H256> {
+	if !is_label(label) {
 		return None
 	}
 
-	Some(H256(blake2_256(s.as_bytes())))
-}
-
-/// Get the root namehash.
-pub fn root_namehash() -> H256 {
-	H256::default()
+	Some(H256(blake2_256(label)))
 }
 
 /// Get a name hash given a parent namehash. Returns None if the label is not valid.
-pub fn namehash(name: &str, parent: &H256) -> Option<H256> {
-	if let Some(labelhash) = labelhash(name) {
-		let mut input = [0u8; 64];
+pub fn namehash(name: &Name) -> Option<H256> {
+	let mut current = H256::default();
 
-		input[0..32].copy_from_slice(&parent[..]);
-		input[32..64].copy_from_slice(&labelhash[..]);
+	for label in name {
+		if let Some(labelhash) = labelhash(label) {
+			let mut input = [0u8; 64];
 
-		Some(H256(blake2_256(&input)))
-	} else {
-		None
+			input[0..32].copy_from_slice(&current[..]);
+			input[32..64].copy_from_slice(&labelhash[..]);
+
+			current = H256(blake2_256(&input));
+		} else {
+			return None
+		}
 	}
+
+	Some(current)
 }

@@ -15,6 +15,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+use crate::RawLabel;
+
 fn is_letter(c: &u8) -> bool {
 	c.is_ascii_lowercase()
 }
@@ -28,12 +30,12 @@ fn is_hyphen(c: &u8) -> bool {
 }
 
 /// Check if a given string is a valid label.
-pub fn is_label(s: &str) -> bool {
+pub fn is_label(s: &RawLabel) -> bool {
 	if !s.is_ascii() {
 		return false
 	}
 
-	let mut bytes = s.bytes().peekable();
+	let mut bytes = s.iter().peekable();
 
 	let is_first_valid = bytes.next().map(|first| {
 		is_letter(&first)
