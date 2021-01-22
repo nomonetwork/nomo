@@ -27,7 +27,7 @@ use sp_core::{blake2_256, H256};
 
 /// A domain name. It's a list of labels, with the top-level one in the front.
 #[cfg_attr(feature = "std", derive(Serialize, Deserialize))]
-#[derive(Default, Eq, PartialEq, Clone, Encode, Decode)]
+#[derive(Default, Eq, PartialEq, Clone, Encode, Decode, Debug)]
 pub struct Name(pub Vec<Label>);
 
 impl Name {
@@ -46,11 +46,25 @@ impl Name {
 
 		current
 	}
+
+	/// Get parent of current name.
+	pub fn parent(&self) -> Option<Name> {
+		let mut parent = self.clone();
+		match parent.0.pop() {
+			Some(_) => Some(parent),
+			None => None,
+		}
+	}
+
+	/// Whether the current name is root.
+	pub fn is_root(&self) -> bool {
+		self.0.len() == 0
+	}
 }
 
 /// A domain label.
 #[cfg_attr(feature = "std", derive(Serialize))]
-#[derive(Eq, PartialEq, Clone, Encode)]
+#[derive(Eq, PartialEq, Clone, Encode, Debug)]
 pub struct Label(Vec<u8>);
 
 /// Unvalidated raw domain label.

@@ -3699,6 +3699,7 @@ dependencies = [
  "frame-benchmarking",
  "frame-support",
  "frame-system",
+ "np-domain",
  "pallet-balances",
  "parity-scale-codec",
  "serde",

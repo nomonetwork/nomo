@@ -10,6 +10,7 @@ description = "Domain registry runtime pallet for Nomo."
 [dependencies]
 serde = { version = "1.0.101", optional = true }
 codec = { package = "parity-scale-codec", version = "1.3.6", default-features = false }
+np-domain = { path = "../../primitives/domain", default-features = false }
 frame-support = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 frame-system = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
 pallet-balances = { version = "2.0.0", default-features = false, git = "https://github.com/paritytech/substrate" }
@@ -27,12 +28,13 @@ default = ["std"]
 std = [
 	"serde",
 	"codec/std",
+	"np-domain/std",
 	"sp-runtime/std",
 	"frame-benchmarking/std",
 	"frame-support/std",
 	"frame-system/std",
 	"pallet-balances/std",
 	"sp-io/std",
-	"sp-std/std"
+	"sp-std/std",
 ]
 runtime-benchmarks = ["frame-benchmarking"]
