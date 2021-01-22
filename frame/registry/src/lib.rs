@@ -22,9 +22,9 @@
 use codec::{Encode, EncodeLike, Decode};
 use sp_std::{prelude::*, fmt::Debug};
 use frame_support::{
-	decl_module, decl_storage, decl_event, decl_error, ensure
+	dispatch::DispatchResult, decl_module, decl_storage, decl_event, decl_error, ensure
 };
-use frame_system::ensure_signed;
+use frame_system::{ensure_signed, ensure_root};
 use np_domain::Name;
 
 pub trait Ownership<T: Config>: Encode + Decode + EncodeLike + Default + Eq + Debug + Clone {
@@ -35,6 +35,13 @@ pub trait Ownership<T: Config>: Encode + Decode + EncodeLike + Default + Eq + De
 pub trait Config: pallet_balances::Config {
 	type Ownership: Ownership<Self>;
 	type Event: From<Event<Self>> + Into<<Self as frame_system::Config>::Event>;
+}
+
+pub trait Registry<T: Config> {
+	fn set_ownership_as(as_ownership: T::Ownership, name: Name, ownership: T::Ownership) -> DispatchResult;
+	fn force_set_ownership(name: Name, ownership: T::Ownership);
+	fn can_set_ownership(as_ownership: T::Ownership, name: Name) -> bool;
+	fn is_owned(as_ownership: T::Ownership, name: Name) -> bool;
 }
 
 decl_storage! {
@@ -52,7 +59,6 @@ decl_event! {
 decl_error! {
 	pub enum Error for Module<T: Config> {
 		OwnershipMismatch,
-		RootOwnershipNotAllowed,
 	}
 }
 
@@ -65,25 +71,64 @@ decl_module! {
 		#[weight = 0]
 		fn set_ownership(origin, name: Name, ownership: T::Ownership) {
 			let owner = ensure_signed(origin)?;
-			let ownership = Ownership::<T>::account(owner);
 
-			ensure!(!name.is_root(), Error::<T>::RootOwnershipNotAllowed);
+			<Self as Registry<T>>::set_ownership_as(Ownership::<T>::account(owner), name, ownership)?;
+		}
 
-			let parent = name.parent().ok_or(Error::<T>::OwnershipMismatch)?;
-			let parent_ownership = Ownerships::<T>::get(&parent);
+		#[weight = 0]
+		fn force_set_ownership(origin, name: Name, ownership: T::Ownership) {
+			ensure_root(origin)?;
 
-			ensure!(parent_ownership == ownership, Error::<T>::OwnershipMismatch);
-
-			if ownership == T::Ownership::none() {
-				Ownerships::<T>::remove(name.clone());
-			} else {
-				Ownerships::<T>::insert(name.clone(), ownership.clone());
-			}
-
-			Self::deposit_event(Event::<T>::OwnershipSet(name, ownership));
+			<Self as Registry<T>>::force_set_ownership(name, ownership);
 		}
 	}
 }
 
-impl<T: Config> Module<T> {
+impl<T: Config> Registry<T> for Module<T> {
+	fn set_ownership_as(as_ownership: T::Ownership, name: Name, ownership: T::Ownership) -> DispatchResult {
+		let parent = name.parent().ok_or(Error::<T>::OwnershipMismatch)?;
+		let parent_ownership = Ownerships::<T>::get(&parent);
+
+		ensure!(parent_ownership == as_ownership, Error::<T>::OwnershipMismatch);
+
+		if ownership == T::Ownership::none() {
+			Ownerships::<T>::remove(name.clone());
+		} else {
+			Ownerships::<T>::insert(name.clone(), ownership.clone());
+		}
+
+		Self::deposit_event(Event::<T>::OwnershipSet(name, ownership));
+
+		Ok(())
+	}
+
+	fn force_set_ownership(name: Name, ownership: T::Ownership) {
+		if ownership == T::Ownership::none() {
+			Ownerships::<T>::remove(name.clone());
+		} else {
+			Ownerships::<T>::insert(name.clone(), ownership.clone());
+		}
+
+		Self::deposit_event(Event::<T>::OwnershipSet(name, ownership));
+	}
+
+	fn can_set_ownership(as_ownership: T::Ownership, name: Name) -> bool {
+		if name.is_root() {
+			return false
+		}
+
+		let parent = match name.parent() {
+			Some(parent) => parent,
+			None => return false,
+		};
+		let parent_ownership = Ownerships::<T>::get(&parent);
+
+		parent_ownership == as_ownership
+	}
+
+	fn is_owned(as_ownership: T::Ownership, name: Name) -> bool {
+		let ownership = Ownerships::<T>::get(&name);
+
+		ownership == as_ownership
+	}
 }
